@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1586963564218.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1552493889",
+    "id" : "4998345A",
+    "lastKnownWriteTime" : 1587131233,
+    "last_content_update" : 1587131233119,
+    "path" : "~/projects/functional_validation/6aa1_cnv_exp/qPCR_script_6aa1.R",
+    "project_path" : null,
+    "properties" : {
+        "cursorPosition" : "23,30",
+        "scrollLine" : "0"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
