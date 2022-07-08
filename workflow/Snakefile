@@ -1,0 +1,146 @@
+### snakefile to look for structural variation associated with 2l sweep
+
+import pandas as pd
+import malariagen_data 
+configfile: "config/config.yaml"
+
+
+ag3 = malariagen_data.Ag3(pre=True)
+ag3_sample_sets = config['VObsCloud']['sample_sets']
+metadata = ag3.sample_metadata(sample_sets=ag3_sample_sets)
+
+include: "rules/indels.smk"
+
+rule all:
+    input:
+        expand("results/alignments_{name}/{sampleID}.bam", name=config['LocusOfInterest']['name'], sampleID = metadata['sample_id']),
+        expand("results/indels/calls.{name}.indels.vcf", name=config['LocusOfInterest']['name'])
+		#expand("analysis/coverage/{sample}.cov", sample=samples),
+		#expand("analysis/svaba/{sample}.svaba.sv.vcf", sample=samples),
+		#expand("analysis/manta/{sample}/results/variants/diploidSV.vcf.gz", sample=samples),
+		#expand("analysis/manta_malinih/{sample}/results/variants/diploidSV.vcf.gz", sample=samples),
+		#expand("data/alignment/{sample}-{reference}.bam.bai", sample=samples, reference=['PEST', 'mali-nih'])
+
+
+
+
+
+
+
+
+rule windowed_coverage:
+    input:
+        "../bam/bwa_gatk/{sample}.bam"
+    output:
+        "analysis/coverage/{sample}.cov"
+    log:
+        "logs/coverage/{sample}.log"
+    threads:8
+    shell: "mosdepth {input} --by 300 --threads {threads} > {output} 2> {log}"
+
+
+rule svaba:
+    input:
+        "../bam/bwa_gatk/{sample}_C.bam"
+    output:
+        "analysis/svaba/{sample}.svaba.sv.vcf"
+    log:
+        "logs/indel_sv/{sample}.log"
+    params:
+        ref="../reference/Anopheles_reordered_AgamP4.fasta"
+    threads:8
+    shell: "svaba run -t {input} -p {threads} -L 6 -I -a analysis/svaba/{wildcards.sample} -G {params.ref} 2> {log}"
+
+rule manta:
+    input:
+        "../bam/bwa_gatk/{sample}_C.bam"
+    output:
+        "analysis/manta/{sample}/results/variants/diploidSV.vcf.gz"
+    log:
+        "logs/indel_manta/{sample}.log"
+    params:
+        ref="../reference/Anopheles_reordered_AgamP4.fasta",
+	rundir="analysis/manta/{sample}",
+    threads:8
+    shell:
+        """
+        configManta.py --bam {input} --reference {params.ref} --runDir {params.rundir} --referenceFasta {params.ref} --callRegions {params.regions} 2> {log}
+        {params.rundir}/runWorkflow.py -m local --jobs {threads} 2>> {log}
+        """
+
+rule bam2fastq:
+    input:
+        bam="../bam/bwa_gatk/{sample}_C.bam"
+    output:
+        fq1="data/reads/{sample}_1.fq.gz",
+        fq2="data/reads/{sample}_2.fq.gz"
+    log:
+        "logs/sortbam2fastq/{sample}.log"
+    shell:
+        """
+        (samtools sort -n {input.bam} | 
+        bedtools bamtofastq -i - -fq data/reads/{wildcards.sample}_1.fq -fq2 data/reads/{wildcards.sample}_2.fq) 2> {log}
+        pigz data/reads/{wildcards.sample}_1.fq
+        pigz data/reads/{wildcards.sample}_2.fq
+        """
+
+rule Abyss:
+	input:
+		fq1="data/reads/{sample}_1.fq.gz",
+		fq2="data/reads/{sample}_2.fq.gz"
+	output:
+		"data/assembly/{sample}-6.fa"
+	log:
+		"logs/Abyss/{sample}_assembly.log"
+	threads:12
+	params:
+		k=96,
+		dir="data/assembly"
+	shell:
+		"""
+		abyss-pe k={params.k} name={wildcards.sample} np={threads} in='{input.fq1} {input.fq2}' 2> {log}
+		mv {wildcards.sample}* {params.dir}
+		"""
+
+rule minimap2PEST:
+    input:
+        "data/assembly/{sample}-6.fa"
+    output:
+        "data/alignment/{sample}-PEST.sam"
+    params:
+        ref="data/reference/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fasta"
+    log:
+        "logs/minimap2PEST/{sample}.log"
+    shell:
+        """
+        minimap2 -ax asm5 {params.ref} {input} > {output} 2> {log}
+        """
+
+rule minimap2malinih:
+    input:
+        "data/assembly/{sample}-6.fa"
+    output:
+        "data/alignment/{sample}-mali-nih.sam"
+    params:
+        ref="data/reference/Anopheles-coluzzii-Mali-NIH_SCAFFOLDS_AcolM1.fa"
+    log:
+        "logs/minimap2malinih/{sample}.log"
+    shell:
+        """
+        minimap2 -ax asm5 {params.ref} {input} > {output} 2> {log}
+        """
+
+rule samtoolssort_index:
+    input:
+        "data/alignment/{sample}-{reference}.sam"
+    output:
+        bam='data/alignment/{sample}-{reference}.bam',
+	idx='data/alignment/{sample}-{reference}.bam.bai'
+    log:
+        "logs/bamandindex/{sample}_{reference}.log"
+    shell:
+        """
+	samtools view {input} -b | samtools sort - > {output.bam}
+	samtools index {output.bam} 
+        """
+
