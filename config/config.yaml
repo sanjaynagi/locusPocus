@@ -9,4 +9,13 @@ LocusOfInterest:
       region: "2L:28520000-28580000"
       start: 28_520_000
       end: 28_580_000
-      focus: 28_547_757
+      focus: 28_547_767
+
+
+
+phylo:
+      regions:
+            focal: 28_547_767
+            upstream: 30_547_767
+            downstream: 26_547_767
+      flanking: 10_000

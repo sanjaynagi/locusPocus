@@ -14,7 +14,8 @@ include: "rules/indels.smk"
 rule all:
     input:
         expand("results/alignments_{name}/{sampleID}.bam", name=config['LocusOfInterest']['name'], sampleID = metadata['sample_id']),
-        expand("results/indels/calls.{name}.indels.vcf", name=config['LocusOfInterest']['name'])
+        expand("results/indels/calls.{name}.indels.vcf", name=config['LocusOfInterest']['name']),
+        expand("{name}_{region}.fasta.model.gz", name=config['LocusOfInterest']['name'], region=config['phylo']['regions'])
 		#expand("analysis/coverage/{sample}.cov", sample=samples),
 		#expand("analysis/svaba/{sample}.svaba.sv.vcf", sample=samples),
 		#expand("analysis/manta/{sample}/results/variants/diploidSV.vcf.gz", sample=samples),
