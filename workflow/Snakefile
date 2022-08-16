@@ -6,16 +6,21 @@ configfile: "config/config.yaml"
 
 
 ag3 = malariagen_data.Ag3(pre=True)
-ag3_sample_sets = config['VObsCloud']['sample_sets']
+ag3_sample_sets = config['ag3']['sample_sets']
 metadata = ag3.sample_metadata(sample_sets=ag3_sample_sets)
 
 include: "rules/indels.smk"
+include: "rules/phylo.smk"
+include: "rules/mvncall.smk"
 
 rule all:
     input:
-        expand("results/alignments_{name}/{sampleID}.bam", name=config['LocusOfInterest']['name'], sampleID = metadata['sample_id']),
-        expand("results/indels/calls.{name}.indels.vcf", name=config['LocusOfInterest']['name']),
-        expand("{name}_{region}.fasta.model.gz", name=config['LocusOfInterest']['name'], region=config['phylo']['regions'])
+        "resources/.kernel.set",
+        #expand("results/alignments_{name}/{sampleID}.bam", name=config['LocusOfInterest']['name'], sampleID = metadata['sample_id']),
+        #expand("results/indels/calls.{name}.indels.vcf", name=config['LocusOfInterest']['name']),
+        #expand("{name}_{region}.fasta.model.gz", name=config['LocusOfInterest']['name'], region=config['phylo']['regions']),
+        expand("results/{name}_phasedMulti.vcf", name=config['LocusOfInterest']['name'])
+
 		#expand("analysis/coverage/{sample}.cov", sample=samples),
 		#expand("analysis/svaba/{sample}.svaba.sv.vcf", sample=samples),
 		#expand("analysis/manta/{sample}/results/variants/diploidSV.vcf.gz", sample=samples),
@@ -24,9 +29,16 @@ rule all:
 
 
 
-
-
-
+rule set_kernel:
+    input:
+        srcdir('envs/pythonGenomics.yaml')
+    output:
+        touch(f"resources/.kernel.set")
+    conda: 'envs/pythonGenomics.yaml'
+    shell: 
+        """
+        python -m ipykernel install --user --name locusPocus
+        """
 
 
 rule windowed_coverage:

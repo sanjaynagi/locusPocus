@@ -1,10 +1,25 @@
-VObsCloud:
-      sample_sets: ['AG1000G-GH']
+ag3:
+      sample_sets: [
+            # Ag1000G phase 3 sample sets in Ag3.0
+            "AG1000G-GH", 
+            'AG1000G-ML-A',
+            'AG1000G-BF-A',
+            'AG1000G-BF-B',
+            'AG1000G-GN-A',
+            'AG1000G-GN-B',
+            'AG1000G-TZ',
+            # GAARDIAN sample set in Ag3.4
+            '1244-VO-GH-YAWSON-VMF00149',
+            # GAARD Ghana sample set in Ag3.2
+            "1244-VO-GH-YAWSON-VMF00051",
+            '1245-VO-CI-CONSTANT-VMF00054',
+            '1253-VO-TG-DJOGBENOU-VMF00052',
+            '1237-VO-BJ-DJOGBENOU-VMF00050']
 
 reference: "resources/reference/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa"
 
 LocusOfInterest:
-      name: "Coeae1f"
+      name: "coeae1f"
       contig: "2L"
       region: "2L:28520000-28580000"
       start: 28_520_000
