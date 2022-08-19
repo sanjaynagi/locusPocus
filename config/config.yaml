@@ -27,10 +27,19 @@ LocusOfInterest:
       focus: 28_547_767
 
 
-
 phylo:
+      activate: True
       regions:
             focal: 28_547_767
             upstream: 30_547_767
             downstream: 26_547_767
+            collinear: 45_000_000
       flanking: 10_000
+      
+
+mvncall:
+      activate: False
+
+      
+indels:
+      activate: False
