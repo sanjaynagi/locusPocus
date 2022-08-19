@@ -1,0 +1,11 @@
+resources/reference
+.Rproj.user
+results/protein*
+.snakemake/
+logs/
+results/tracking*
+results/variation/pm*
+workflow/notebooks/molecularDocking/*config
+*sdf
+*pdbqt
+*log
