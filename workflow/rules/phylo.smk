@@ -15,21 +15,21 @@
 
 rule iqtree:
     input:
-        fastas = "{name}_{region}.fasta"
+        fasta = "results/phylo/{name}_{region}.fasta"
     output:
-        phy = "{name}_{region}.fasta.uniqueseq.phy",
-        model = "{name}_{region}.fasta.model.gz",
-        treefile = "{name}_{region}.fasta.treefile",
-        iqtree = "{name}_{region}.fasta.iqtree",
-        bionj = "{name}_{region}.fasta.bionj"
+        phy = "results/phylo/{name}_{region}.fasta.uniqueseq.phy",
+        model = "results/phylo/{name}_{region}.fasta.model.gz",
+        treefile = "results/phylo/{name}_{region}.fasta.treefile",
+        iqtree = "results/phylo/{name}_{region}.fasta.iqtree",
+        bionj = "results/phylo/{name}_{region}.fasta.bionj"
     log:
         "logs/iqtree/{name}_{region}.log"
     params:
         bootstraps = 10000
-    threads: 16
+    threads: 1
     shell:
         """
-        iqtree -s {input.fasta} -B {bootstraps} -T {threads} 2> {log}
+        iqtree -s {input.fasta} -B {params.bootstraps} -T {threads} 2> {log}
         """
 
 

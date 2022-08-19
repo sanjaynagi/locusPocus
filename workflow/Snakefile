@@ -15,12 +15,10 @@ include: "rules/mvncall.smk"
 
 rule all:
     input:
-        "resources/.kernel.set",
         #expand("results/alignments_{name}/{sampleID}.bam", name=config['LocusOfInterest']['name'], sampleID = metadata['sample_id']),
-        #expand("results/indels/calls.{name}.indels.vcf", name=config['LocusOfInterest']['name']),
-        #expand("{name}_{region}.fasta.model.gz", name=config['LocusOfInterest']['name'], region=config['phylo']['regions']),
-        expand("results/{name}_phasedMulti.vcf", name=config['LocusOfInterest']['name'])
-
+        expand("results/indels/calls.{name}.indels.vcf", name=config['LocusOfInterest']['name']) if config['indels']['activate'] else [],
+        expand("results/phylo/{name}_{region}.fasta.model.gz", name=config['LocusOfInterest']['name'], region=config['phylo']['regions']) if config['phylo']['activate'] else [],
+        expand("results/{name}_phasedMulti.vcf", name=config['LocusOfInterest']['name']) if config['mvncall']['activate'] else [],
 		#expand("analysis/coverage/{sample}.cov", sample=samples),
 		#expand("analysis/svaba/{sample}.svaba.sv.vcf", sample=samples),
 		#expand("analysis/manta/{sample}/results/variants/diploidSV.vcf.gz", sample=samples),

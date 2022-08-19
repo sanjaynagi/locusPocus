@@ -4,6 +4,7 @@
 
 rule write_haps_for_mvncall:
     input:
+        "resources/.kernel.set",
         nb = "workflow/notebooks/haps_for_mvncall.ipynb",
     output:
         nb = "results/notebooks/haps_for_mvncall_{name}.ipynb",
