@@ -4,7 +4,6 @@ import pandas as pd
 import malariagen_data 
 configfile: "config/config.yaml"
 
-
 ag3 = malariagen_data.Ag3(pre=True)
 ag3_sample_sets = config['ag3']['sample_sets']
 metadata = ag3.sample_metadata(sample_sets=ag3_sample_sets)
@@ -13,12 +12,15 @@ include: "rules/indels.smk"
 include: "rules/phylo.smk"
 include: "rules/mvncall.smk"
 
+
+
+
 rule all:
     input:
-        #expand("results/alignments_{name}/{sampleID}.bam", name=config['LocusOfInterest']['name'], sampleID = metadata['sample_id']),
-        expand("results/indels/calls.{name}.indels.vcf", name=config['LocusOfInterest']['name']) if config['indels']['activate'] else [],
-        expand("results/phylo/{name}_{region}.fasta.model.gz", name=config['LocusOfInterest']['name'], region=config['phylo']['regions']) if config['phylo']['activate'] else [],
-        expand("results/{name}_phasedMulti.vcf", name=config['LocusOfInterest']['name']) if config['mvncall']['activate'] else [],
+        #expand("results/alignments_{name}/{sampleID}.bam", name=config['Locus']['name'], sampleID = metadata['sample_id']),
+        expand("results/indels/calls.{name}.indels.vcf", name=config['Locus']['name']) if config['indels']['activate'] else [],
+        expand("results/phylo/{name}_{region}.fasta.model.gz", name=config['Locus']['name'], region=config['phylo']['regions']) if config['phylo']['activate'] else [],
+        expand("results/phasing/{name}.phasedMulti.vcf", name=config['Locus']['name']) if config['mvncall']['activate'] else [],
 		#expand("analysis/coverage/{sample}.cov", sample=samples),
 		#expand("analysis/svaba/{sample}.svaba.sv.vcf", sample=samples),
 		#expand("analysis/manta/{sample}/results/variants/diploidSV.vcf.gz", sample=samples),

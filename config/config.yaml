@@ -18,27 +18,30 @@ ag3:
 
 reference: "resources/reference/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa"
 
-LocusOfInterest:
+Locus:
       name: "coeae1f"
       contig: "2L"
       region: "2L:28520000-28580000"
-      start: 28_520_000
-      end: 28_580_000
+      start: 28_545_395
+      end: 28_550_750
       focus: 28_547_767
 
 
 phylo:
-      activate: True
+      activate: False
       regions:
             focal: 28_547_767
             upstream: 30_547_767
             downstream: 26_547_767
             collinear: 45_000_000
       flanking: 10_000
-      
+      outgroup: 
+            alleles: /home/sanj/ag1000g/data/outgroups/outgroup_alleles.h5
+            pos: /home/sanj/ag1000g/data/ag1000g.phase1.ar3.pass/{contig}/variants/POS/
+      remove_2la_hets: True
 
 mvncall:
-      activate: False
+      activate: True
 
       
 indels:

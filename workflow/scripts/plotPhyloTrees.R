@@ -14,7 +14,29 @@ phy_list  = c("results/phylo/coeae1f_focal.fasta.treefile", "results/phylo/coeae
 phy_name  = c("Focal haplotype","Upstream","Downstream")
 
 
-name = 'coeae1f'
+
+
+
+name='coeae1f'
+region='focal'
+phi = f("results/phylo/{name}_{region}.fasta.treefile")
+phy = read.tree(phi)
+phy_p = midpoint.root(phy)
+
+meta_path = f("results/phylo/{name}_{region}.metadata.tsv")
+meta = fread(meta_path) %>% as.data.frame()
+meta = meta %>% arrange(factor(hap, levels = phy_p$tip.label))
+
+meta$`Sweep IDs`
+
+#table(meta$karyotype, meta$`Sweep IDs`)
+
+#meta_sweep3 = meta %>% filter(`Sweep IDs` == 3)
+#meta_sweep3 %>% fwrite(., "results/sweep3_meta.tsv", sep="\t")
+
+
+meta %>% with(which(aim_species == 'mela'))
+
 
 
 plot_phylo = function(phi, meta, var, region, name, min_edge_length = 5e-5){
@@ -29,6 +51,8 @@ plot_phylo = function(phi, meta, var, region, name, min_edge_length = 5e-5){
   phy_p = midpoint.root(phy)
   meta = meta %>% arrange(factor(hap, levels = phy_p$tip.label))
   
+  #phy = root(phy, outgroup=3368)
+  
   phy_p$tip_label_sep  = gsub("_"," ",phy_p$tip.label)
   phy_p$tip_species    = meta$aim_species
   phy_p$tip_country = meta$country
@@ -42,10 +66,10 @@ plot_phylo = function(phi, meta, var, region, name, min_edge_length = 5e-5){
   if (var == 'karyotype'){
     meta = meta %>% mutate("tip_color" = case_when(karyotype == '2l+a' ~ 'bisque2',
                                                    karyotype == '2la' ~ 'dodgerblue', TRUE ~ 'grey'))
-  } else if (var == 'Sweep IDs'){
+  } else if (var == 'cluster_id'){
     meta$tip_color = rainbow(length(unique(meta[,var])))[as.factor(meta[, var])]
-    meta = meta %>% mutate(tip_color = case_when(`Sweep IDs` == 'wt' ~ 'grey',
-                                                 `Sweep IDs` %in% c("mela", "meru", "quad") ~ 'black',
+    meta = meta %>% mutate(tip_color = case_when(cluster_id == 'wt' ~ 'grey',
+                                                 cluster_id %in% c("mela", "meru", "quad") ~ 'black',
                                                  TRUE ~ tip_color))
   } else if (var == 'aim_species'){
     meta = meta %>% mutate("tip_color" = case_when(aim_species == 'gambiae' ~ 'indianred',
@@ -61,13 +85,24 @@ plot_phylo = function(phi, meta, var, region, name, min_edge_length = 5e-5){
              tip.color = meta$tip_color, lab4ut = "axial",
              edge.color = "slategray3",
              font = 1, edge.width = 2, node.depth=1, cex=5,
-             main=f("{name} {region}"), no.margin = TRUE)
+             main=f("{name} {region} | {var}"), no.margin = F)
 }
 
 
+jpeg(file=f("results/phylo/{name}_karyo.phylo.jpg"), width=10, height=20)
 plot_phylo(phi, meta, var='karyotype', region="focal", name=name)
+dev.off()
+
+svg(file=f("results/phylo/{name}_species.phylo.svg"), width=10, height=20)
 plot_phylo(phi, meta, var='aim_species', region="focal", name=name)
-plot_phylo(phi, meta, var='Sweep IDs', region="focal", name=name)
+dev.off()
+?svg
+unique(meta$cluster_id)
+
+plot_phylo(phi, meta, var='cluster_id', region="focal", name=name)
+
+
+
 
 plot_phylo(phi, meta, var='karyotype', region="downstream", name=name)
 plot_phylo(phi, meta, var='aim_species', region="downstream", name=name)

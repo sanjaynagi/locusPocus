@@ -47,7 +47,7 @@ rule subsetBams:
     log:
         "logs/subset_bams/{sampleID}.{name}.log"
     params:
-        region = config['LocusOfInterest']['region']
+        region = config['Locus']['region']
     shell:
         """
         samtools view {input} {params.region} -bS -o {output} 2> {log}
@@ -57,8 +57,8 @@ rule subsetBams:
 
 rule haplotype_caller_gvcf:
     input:
-        bams = expand("results/alignments_{name}/{sampleID}.bam", name=config['LocusOfInterest']['name'], sampleID = metadata['sample_id']),
-        bais = expand("results/alignments_{name}/{sampleID}.bam.bai" , name=config['LocusOfInterest']['name'], sampleID = metadata['sample_id']),
+        bams = expand("results/alignments_{name}/{sampleID}.bam", name=config['Locus']['name'], sampleID = metadata['sample_id']),
+        bais = expand("results/alignments_{name}/{sampleID}.bam.bai" , name=config['Locus']['name'], sampleID = metadata['sample_id']),
         ref = config['reference']
     output:
         gvcf = "results/indels/gvcfs/{sampleID}.g.vcf"
